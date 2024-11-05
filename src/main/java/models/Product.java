@@ -111,4 +111,12 @@ public class Product {
     public void setStyle(String style) {
         this.style = style;
     }
+
+	@Override
+	public String toString() {
+		return "Product [productID=" + productID + ", salerID=" + salerID + ", categoryID=" + categoryID
+				+ ", productName=" + productName + ", quality=" + quality + ", price=" + price + ", discount="
+				+ discount + ", productImagePath=" + productImagePath + ", color=" + color + ", style=" + style + "]";
+	}
+    
 }

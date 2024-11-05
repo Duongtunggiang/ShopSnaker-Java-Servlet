@@ -14,5 +14,24 @@
     <servlet-name>AccountController</servlet-name>
     <url-pattern>/AccountController</url-pattern>
   </servlet-mapping>
-  
+  <servlet>
+    <description></description>
+    <display-name>HomeController</display-name>
+    <servlet-name>HomeController</servlet-name>
+    <servlet-class>controller.HomeController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HomeController</servlet-name>
+    <url-pattern>/HomeController</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>SalerController</display-name>
+    <servlet-name>SalerController</servlet-name>
+    <servlet-class>controller.SalerController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SalerController</servlet-name>
+    <url-pattern>/SalerController</url-pattern>
+  </servlet-mapping>
 </web-app>

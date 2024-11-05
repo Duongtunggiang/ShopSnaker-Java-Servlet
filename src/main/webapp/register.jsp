@@ -27,8 +27,8 @@
                 <label for="roleID">Vai trò</label>
                 <select class="form-control" id="roleID" name="roleID" required>
                     <option value="1">Admin</option>
-                    <option value="2">Saler</option>
-                    <option value="3">Customer</option>
+                    <option value="2">Khách hàng</option>
+                    <option value="3">Bán hàng</option>
                 </select>
             </div>
             <button type="submit" class="btn btn-primary">Đăng Ký</button>
