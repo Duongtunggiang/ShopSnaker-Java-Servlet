@@ -10,53 +10,53 @@
 <body>
 <div class="container">
     <h1>Thêm sản phẩm mới</h1>
-    <form action="saler?action=saveProduct" method="post" >
-        <input type="hidden" name="action" value="saveProduct"> 
-        <!-- <input type="hidden" name="salerID"> -->
-        <div class="form-group">
-            <label for="name">Tên sản phẩm:</label>
-            <input type="text" class="form-control" name="productName" required>
-        </div>
-        <div class="form-group">
-            <label for="quality">Số lượng:</label>
-            <input type="number" class="form-control" name="quality" >
-        </div>
-        <div class="form-group">
-            <label for="price">Giá:</label>
-            <input type="number" class="form-control" name="price" step="0.01" required>
-        </div>
-        <div class="form-group">
-            <label for="discount">Giảm giá:</label>
-            <input type="number" class="form-control" name="discount" step="0.01">
-        </div>
-        <div class="form-group">
-            <label for="imagePath">Hình ảnh:</label>
-            <input type="file" class="form-control" name="productImagePath" accept="image/*"  required>
-        </div>
-        <div class="form-group">
-            <label for="color">Màu sắc:</label>
-            <input type="text" class="form-control" name="color">
-        </div>
-        <div class="form-group">
-            <label for="style">Phong cách:</label>
-            <input type="text" class="form-control" name="style">
-        </div>
-		<div class="form-group">
-		    <label for="categoryID">Danh mục:</label>
-				<select class="form-control" name="categoryID" id="categoryID" required>
-				    <c:forEach var="category" items="${categories}">
-				        <option value="${category.categoryID}">${category.categoryName}</option>
-				    </c:forEach>
-				    <c:if test="${empty categories}">
-				        <option value="">Không có danh mục nào!</option>
-				    </c:if>
-				</select>
-		
-		    <a class="btn btn-primary" href="saler?action=createCategory">Thêm danh mục</a>
-		</div>
-        <button type="submit" class="btn btn-success">Lưu sản phẩm</button>
-        <a href="saler?action=myProducts" class="btn btn-secondary">Trở về</a>
-    </form>
+ <form action="saler?action=saveProduct" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="action" value="saveProduct">
+    <div class="form-group">
+        <label for="name">Tên sản phẩm:</label>
+        <input type="text" class="form-control" name="productName" required>
+    </div>
+    <div class="form-group">
+        <label for="quality">Số lượng:</label>
+        <input type="number" class="form-control" name="quality">
+    </div>
+    <div class="form-group">
+        <label for="price">Giá:</label>
+        <input type="number" class="form-control" name="price" step="0.01" required>
+    </div>
+    <div class="form-group">
+        <label for="discount">Giảm giá:</label>
+        <input type="number" class="form-control" name="discount" step="0.01">
+    </div>
+    <div class="form-group">
+        <label for="productImagePath">Hình ảnh:</label>
+        <input type="file" class="form-control" name="productImagePath" accept="image/*" required>
+    </div>
+    <div class="form-group">
+        <label for="color">Màu sắc:</label>
+        <input type="text" class="form-control" name="color">
+    </div>
+    <div class="form-group">
+        <label for="style">Phong cách:</label>
+        <input type="text" class="form-control" name="style">
+    </div>
+    <div class="form-group">
+        <label for="categoryID">Danh mục:</label>
+        <select class="form-control" name="categoryName" id="categoryID" required>
+            <c:forEach var="category" items="${categories}">
+                <option value="${category.categoryName}">${category.categoryName}</option> <!-- Giá trị của option là categoryName -->
+            </c:forEach>
+            <c:if test="${empty categories}">
+                <option value="">Không có danh mục nào!</option>
+            </c:if>
+        </select>
+        <a class="btn btn-primary mt-3" href="saler?action=createCategory">Thêm danh mục</a>
+    </div>
+    <button type="submit" class="btn btn-success mt-3">Lưu sản phẩm</button>
+    <a href="saler?action=myProducts" class="btn btn-secondary mt-3">Trở về</a>
+</form>
+
+
     <c:if test="${not empty error}">
     <p class="text-danger">${error}</p>
 	</c:if>
@@ -74,6 +74,12 @@
 	</c:if>
 	<c:if test="${not empty error6}">
 	    <p class="text-danger">${error6}</p>
+	</c:if>
+	<c:if test="${not empty error7}">
+	    <p class="text-danger">${error7}</p>
+	</c:if>
+	<c:if test="${not empty error8}">
+	    <p class="text-danger">${error8}</p>
 	</c:if>
 </div>
 </body>

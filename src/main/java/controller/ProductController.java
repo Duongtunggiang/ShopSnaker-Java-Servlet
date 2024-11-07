@@ -2,22 +2,26 @@ package controller;
 
 import dao.ProductDAO;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 import dao.AccountDao;
 import dao.CategoryDAO;
 import models.Product;
 import models.Category;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.util.List;
 
 @WebServlet("/saler")
+@MultipartConfig
 public class ProductController extends HttpServlet {
     private ProductDAO productDAO = new ProductDAO();
     private CategoryDAO categoryDAO = new CategoryDAO();
@@ -91,16 +95,29 @@ public class ProductController extends HttpServlet {
                     return;
                 }
 
-                String categoryIDStr = request.getParameter("categoryID");
-                System.out.println("Category ID: " + categoryIDStr);
-                int categoryID = Integer.parseInt(categoryIDStr);
-                if (categoryID <= 0) {
+             // Lấy Category Name từ form và tìm ID của danh mục đó
+                String categoryIDStr = request.getParameter("categoryName"); // Lấy giá trị categoryName từ form
+                if (categoryIDStr == null || categoryIDStr.trim().isEmpty()) {
+                    request.setAttribute("error1", "Danh mục không hợp lệ.");
+                    request.getRequestDispatcher("saler/createProduct.jsp").forward(request, response);
+                    return;
+                }
+
+                String categoryID = categoryDAO.getCateIDbyCateName(categoryIDStr); // Lấy Category ID từ tên danh mục
+                if (categoryID == null) {
+                    request.setAttribute("error1", "Không tìm thấy danh mục với tên: " + categoryIDStr);
+                    request.getRequestDispatcher("saler/createProduct.jsp").forward(request, response);
+                    return;
+                }
+                int cateID = Integer.parseInt(categoryID);
+                if (cateID <= 0) {
                     request.setAttribute("error1", "Danh mục không hợp lệ. Giá trị nhận được: " + categoryIDStr);
                     request.getRequestDispatcher("saler/createProduct.jsp").forward(request, response);
                     return;
                 }
-              
 
+
+                // Lấy các tham số khác từ form
                 String productName = request.getParameter("productName");
 
                 String priceStr = request.getParameter("price");
@@ -125,7 +142,24 @@ public class ProductController extends HttpServlet {
                     return;
                 }
 
-                String imagePath = request.getParameter("productImagePath");
+                // Xử lý upload ảnh
+                String imagePath = null;
+                Part filePart = request.getPart("productImagePath"); // Đảm bảo tên input là productImagePath trong form
+                if (filePart != null && filePart.getSize() > 0) {
+                    String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                    String uploadDir = getServletContext().getRealPath("/images/products");
+                    File uploadDirFile = new File(uploadDir);
+
+                    if (!uploadDirFile.exists()) {
+                        uploadDirFile.mkdirs();
+                    }
+
+                    // Đường dẫn lưu ảnh
+                    imagePath = "images/products/" + fileName;
+                    filePart.write(uploadDir + File.separator + fileName);
+                }
+
+                // Lấy các tham số khác
                 String color = request.getParameter("color");
                 String style = request.getParameter("style");
 
@@ -141,9 +175,10 @@ public class ProductController extends HttpServlet {
                     return;
                 }
 
+                // Tạo đối tượng Product và lưu vào cơ sở dữ liệu
                 Product newProduct = new Product();
                 newProduct.setSalerID(salerID);
-                newProduct.setCategoryID(categoryID);
+                newProduct.setCategoryID(cateID);
                 newProduct.setProductName(productName);
                 newProduct.setQuality(quality);
                 newProduct.setPrice(price);
@@ -154,11 +189,13 @@ public class ProductController extends HttpServlet {
 
                 productDAO.addProduct(newProduct);
                 response.sendRedirect("saler?action=myProducts");
+
             } catch (Exception e) {
                 request.setAttribute("error6", "Đã xảy ra lỗi: " + e.getMessage());
                 request.getRequestDispatcher("saler/createProduct.jsp").forward(request, response);
             }
             break;
+
 
 
     

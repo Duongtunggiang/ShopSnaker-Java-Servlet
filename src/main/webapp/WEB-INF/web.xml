@@ -34,4 +34,6 @@
     <servlet-name>SalerController</servlet-name>
     <url-pattern>/SalerController</url-pattern>
   </servlet-mapping>
+
+ 
 </web-app>

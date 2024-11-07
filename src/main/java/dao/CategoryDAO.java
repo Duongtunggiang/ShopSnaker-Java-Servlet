@@ -53,6 +53,25 @@ public class CategoryDAO {
         }
         return -1; // Trả về -1 nếu không tìm thấy
     }
+    
+    public String getCateIDbyCateName(String cateName) {
+        String sql = "SELECT CategoryID FROM Category WHERE CategoryName = ?";
+        try (Connection conn = dbContext.getConnection();
+             PreparedStatement stm = conn.prepareStatement(sql)) {
+            stm.setString(1, cateName);
+            ResultSet resultSet = stm.executeQuery();
+            
+            if (resultSet.next()) {
+                return resultSet.getString("CategoryID"); // Sửa thành "CategoryID" thay vì "categoryName"
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return null; // Trả về null nếu không tìm thấy
+    }
+
 
 
 //    public Integer getCategoryIDByName(String categoryName) {

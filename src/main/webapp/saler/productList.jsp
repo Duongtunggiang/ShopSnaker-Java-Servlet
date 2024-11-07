@@ -21,6 +21,7 @@
                 <th>Tên sản phẩm</th>
                 <th>Giá</th>
                 <th>Số lượng</th>
+                <th>Ảnh</th>
                 <th>Hành động</th>
             </tr>
         </thead>
@@ -32,6 +33,8 @@
                     <td>${product.productName}</td>
                     <td>${product.price}</td>
                     <td>${product.quality}</td>
+                    <td><img src="${pageContext.request.contextPath}/${product.productImagePath}" alt="Product Image">
+                    </td>
                     <td>
                         <a href="saler?action=editProduct&id=${product.productID}" class="btn btn-warning">Sửa</a>
                         <form action="saler" method="post" style="display:inline;">
