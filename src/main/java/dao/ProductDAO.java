@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import context.DBContext;
 import models.Product;
@@ -69,6 +70,39 @@ public class ProductDAO {
 //           
 //        }
 //    }
+    public List<Product> getProductsByCategoryId(String id) {
+        List<Product> productList = new ArrayList<>();
+        String sql = "SELECT * FROM product WHERE categoryID = ?";
+
+        try (Connection conn = dbContext.getConnection();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
+            
+            statement.setString(1, id);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Product product = new Product();
+                product.setProductID(resultSet.getInt("productID"));
+                product.setSalerID(resultSet.getInt("salerID"));
+                product.setCategoryID(resultSet.getInt("categoryID"));
+                product.setProductName(resultSet.getString("productName"));
+                product.setQuality(resultSet.getInt("quality"));
+                product.setPrice(resultSet.getBigDecimal("price"));
+                product.setDiscount(resultSet.getBigDecimal("discount"));
+                product.setProductImagePath(resultSet.getString("productImagePath"));
+                product.setColor(resultSet.getString("color"));
+                product.setStyle(resultSet.getString("style"));
+                
+                productList.add(product);
+            }
+
+            resultSet.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return productList;
+    }
 
     public void addProduct(Product product) {
         String sql = "INSERT INTO Product (SalerID, CategoryID, ProductName, Quality, Price, Discount, ProductImagePath, Color, Style) " +
@@ -174,49 +208,52 @@ public class ProductDAO {
             return false;
         }
     }
- // Lấy sản phẩm theo danh sách ID danh mục
     public List<Product> getProductsByCategories(List<Integer> categoryIds) {
-        List<Product> products = new ArrayList<>();
-        
-        // Chỉ tiếp tục nếu danh sách categoryIds không rỗng
+        List<Product> productList = new ArrayList<>();
+
         if (categoryIds == null || categoryIds.isEmpty()) {
-            return products;
+            return productList; // Trả về danh sách rỗng nếu không có ID nào
         }
 
-        // Tạo chuỗi các dấu hỏi cho câu truy vấn
-        String placeholders = String.join(",", categoryIds.stream().map(id -> "?").toArray(String[]::new));
-        String sql = "SELECT * FROM Product WHERE CategoryID IN (" + placeholders + ")";
-        
+        String placeholders = categoryIds.stream()
+                                          .map(id -> "?")
+                                          .collect(Collectors.joining(","));
+        String sql = "SELECT * FROM product WHERE categoryID IN (" + placeholders + ")";
+
         try (Connection conn = dbContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement statement = conn.prepareStatement(sql)) {
             
-            // Đặt các giá trị categoryId vào câu lệnh PreparedStatement
+            // Gán giá trị cho từng placeholder
             for (int i = 0; i < categoryIds.size(); i++) {
-                stmt.setInt(i + 1, categoryIds.get(i));
+                statement.setInt(i + 1, categoryIds.get(i));
             }
 
-            ResultSet rs = stmt.executeQuery();
-            
-            // Duyệt qua kết quả truy vấn và thêm vào danh sách sản phẩm
-            while (rs.next()) {
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
                 Product product = new Product();
-                product.setProductID(rs.getInt("ProductID"));
-                product.setSalerID(rs.getInt("SalerID"));
-                product.setCategoryID(rs.getInt("CategoryID"));
-                product.setProductName(rs.getString("ProductName"));
-                product.setQuality(rs.getInt("Quality"));
-                product.setPrice(rs.getBigDecimal("Price"));
-                product.setDiscount(rs.getBigDecimal("Discount"));
-                product.setProductImagePath(rs.getString("ProductImagePath"));
-                product.setColor(rs.getString("Color"));
-                product.setStyle(rs.getString("Style"));
-                products.add(product);
+                product.setProductID(resultSet.getInt("productID"));
+                product.setSalerID(resultSet.getInt("salerID"));
+                product.setCategoryID(resultSet.getInt("categoryID"));
+                product.setProductName(resultSet.getString("productName"));
+                product.setQuality(resultSet.getInt("quality"));
+                product.setPrice(resultSet.getBigDecimal("price"));
+                product.setDiscount(resultSet.getBigDecimal("discount"));
+                product.setProductImagePath(resultSet.getString("productImagePath"));
+                product.setColor(resultSet.getString("color"));
+                product.setStyle(resultSet.getString("style"));
+                
+                productList.add(product);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        
-        return products;
+
+        return productList;
     }
+
+
+ 
 
 }

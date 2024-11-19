@@ -10,7 +10,9 @@ import models.*;
 import java.io.IOException;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import dao.*;
 
@@ -27,35 +29,44 @@ public class HomeController extends HttpServlet {
     private CategoryDAO categoryDAO = new CategoryDAO();
     private ProductDAO productDAO = new ProductDAO();
 
+//    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+//        List<Category> categories = categoryDAO.getAllCategories();
+//        String categoryIdsParam = request.getParameter("id");
+//        List<Product> products;
+//
+//        if (categoryIdsParam == null || categoryIdsParam.isEmpty()) {
+//            products = productDAO.getAllProducts();
+//        } else {
+//            
+//            products = productDAO.getProductsByCategoryId(categoryIdsParam);
+//        }
+//
+//        request.setAttribute("categories", categories);
+//        request.setAttribute("products", products);
+//        request.getRequestDispatcher("/home/home.jsp").forward(request, response);
+//    }
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         List<Category> categories = categoryDAO.getAllCategories();
-        List<Product> products = productDAO.getAllProducts();
+        String[] categoryIdsParam = request.getParameterValues("id");
+        List<Product> products;
+
+        if (categoryIdsParam == null || categoryIdsParam.length == 0) {
+            products = productDAO.getAllProducts(); 
+        } else {
+            List<Integer> categoryIds = Arrays.stream(categoryIdsParam)
+                                              .map(Integer::parseInt)
+                                              .collect(Collectors.toList());
+            products = productDAO.getProductsByCategories(categoryIds);
+        }
 
         request.setAttribute("categories", categories);
         request.setAttribute("products", products);
         request.getRequestDispatcher("/home/home.jsp").forward(request, response);
-
     }
+
+
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doGet(request, response);
     }
-//    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        // Giả lập dữ liệu mẫu
-//        List<Category> categories = CategoryDAO.getAllCategories();
-//        List<Product> products = ProductDAO.getAllProducts();
-//
-//        request.setAttribute("categories", categories);
-//        request.setAttribute("products", products);
-//        request.getRequestDispatcher("/WEB-INF/views/home.jsp").forward(request, response);
-//    }
-
-//    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        String[] categoryIds = request.getParameter("categoryIds").split(",");
-//        List<Product> filteredProducts = productDAO.getProductsByCategories(categoryIds);
-//
-//        request.setAttribute("products", filteredProducts);
-//        request.getRequestDispatcher("/WEB-INF/views/partials/productList.jsp").forward(request, response);
-//    }
-
 }

@@ -12,7 +12,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"  crossorigin="anonymous">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"  crossorigin="anonymous">
-
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <!-- Custom CSS (nếu có) -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 
@@ -60,6 +60,30 @@
 		    display: block;
 		    opacity: 1;
 		}
+	
+
+	    .list-group-item {
+	        position: relative;
+	        cursor: pointer;
+	    }
+	
+	    .list-group-item input[type="checkbox"] {
+	        position: relative;
+	        z-index: 2;
+	    }
+	
+	    .list-group-item label {
+	        cursor: pointer;
+	        z-index: 1;
+	    }
+	
+	    /* Hover effect for better UX */
+	    .list-group-item:hover {
+	        background-color: #f8f9fa;
+	    }
+
+
+		
         
     </style>
 </head>
@@ -110,6 +134,7 @@
                 </c:choose>
             </ul>
             <script type="text/javascript">
+            
 	         // Xử lý khi nhấn vào tên tài khoản để hiển thị dropdown
 	            document.getElementById("navbarDropdown").addEventListener("click", function(event) {
 	                event.preventDefault(); // Ngăn chặn việc link tải lại trang
@@ -129,6 +154,8 @@
 	                    dropdownMenu.classList.remove("show");
 	                }
 	            });
+	         
+
             </script>
         </div>
     </div>
@@ -145,43 +172,57 @@
                     <button id="btnAllProducts" class="btn btn-primary btn-sm w-100">Tất cả sản phẩm</button>
                 </li>
                 <c:forEach items="${categories}" var="category">
-                    <li class="list-group-item">
-                        <input type="checkbox" class="category-checkbox" value="${category.categoryID}" id="category_${category.categoryID}" />
-                        <label for="category_${category.categoryID}">${category.categoryName}</label>
-                    </li>
-                </c:forEach>
+				   <%-- <li class="list-group-item" style="cursor: pointer;">
+				        <a class="chose-cate text-dark" href="home?id=${category.categoryID}" style="text-decoration: none; cursor: pointer;">
+				            <input type="checkbox" class="category-checkbox me-2" value="${category.categoryID}" id="category_${category.categoryID}" />
+				            <label for="category_${category.categoryID}" style="cursor: pointer;">${category.categoryName}</label>
+				        </a>
+				    </li>  --%>
+				    <li class="list-group-item d-flex align-items-center" style="cursor: pointer;">
+			            <input type="checkbox" class="category-checkbox me-2 flex-shrink-0" value="${category.categoryID}" id="category_${category.categoryID}" />
+			            <label for="category_${category.categoryID}" class="w-100 mb-0">${category.categoryName}</label>
+			        </li>
+									    
+				    <%-- <a href="home?id=${category.categoryID}" class="list-group-item list-group-item-action list-group-item-success 
+            	${tag == c.id ? "active" : ""}">${category.categoryName}</a> --%>
+				</c:forEach>
+
             </ul>
         </div>
 
         <!-- Phần giữa: Danh sách sản phẩm -->
-        <div class="col-md-6" id="product-list">
+        <div class="col-md-7" id="product-list">
             <h3>Danh sách sản phẩm</h3>
-            <c:if test="${not empty products}">
-	            <div class="row">
-	                <c:forEach items="${products}" var="product">
-	                    <div class="col-md-4 mb-4">
-	                        <div class="card">
-	                            <img src="${product.productImagePath != null ? product.productImagePath : '/images/default.jpg'}"
-	                                 class="card-img-top" alt="${product.productName}" style="height: 150px; object-fit: cover;">
-	                            <div class="card-body">
-	                                <h5 class="card-title">${product.productName}</h5>
-	                                <p class="card-text">Giá: ${product.price}</p>
-	                                <a href="${pageContext.request.contextPath}/productDetails?productId=${product.productID}" class="btn btn-primary btn-sm">Chi tiết</a>
-	                                <a href="${pageContext.request.contextPath}/addToCart?productId=${product.productID}" class="btn btn-success btn-sm">Thêm vào giỏ</a>
-	                                <a href="${pageContext.request.contextPath}/buyNow?productId=${product.productID}" class="btn btn-danger btn-sm">Mua ngay</a>
-	                            </div>
-	                        </div>
-	                    </div>
-	                </c:forEach>
-	            </div>
-            </c:if>
-			<c:if test="${empty products}">
-			    <p>Không có sản phẩm nào để hiển thị.</p>
-			</c:if>
+           <%--  <%@ include file="productListHome.jsp" %> --%>
+            <div class="row">
+    <c:if test="${not empty products}">
+        <c:forEach items="${products}" var="product">
+            <div class="col-md-4 mb-4 product-card" data-id="${product.productID}">
+                <div class="card">
+                    <img src="${product.productImagePath != null ? product.productImagePath : '/images/default.jpg'}"
+                         class="card-img-top" alt="${product.productName}" style="height: 150px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">${product.productName}</h5>
+                        <p class="card-text">Giá: ${product.price}</p>
+                        <p></p>
+                        <a href="${pageContext.request.contextPath}/productDetails?productId=${product.productID}" class="btn btn-primary btn-sm">Chi tiết</a>
+                        <a href="${pageContext.request.contextPath}/addToCart?productId=${product.productID}" class="btn btn-success btn-sm">Thêm vào giỏ</a>
+                        <a href="${pageContext.request.contextPath}/buyNow?productId=${product.productID}" class="btn btn-danger btn-sm">Mua ngay</a>
+                    </div>
+                </div>
+            </div>
+        </c:forEach>
+    </c:if>
+    <c:if test="${empty products}">
+        <p>Không có sản phẩm nào để hiển thị.</p>
+    </c:if>
+</div>
+            
+			
         </div>
 
         <!-- Cột bên phải: Thông tin chi tiết sản phẩm -->
-        <div class="col-md-3" style="position: sticky; top: 0;">
+        <%-- <div class="col-md-3" style="position: sticky; top: 0;" id="product-detail">
             <h3>Chi tiết sản phẩm</h3>
             <c:if test="${not empty productDetail}">
                 <div class="card">
@@ -201,39 +242,64 @@
             <c:if test="${empty productDetail}">
                 <p>Chọn sản phẩm để xem chi tiết.</p>
             </c:if>
-        </div>
+        </div> --%>
     </div>
 </div>
 
 <script>
-    // Xử lý khi nhấn nút "Tất cả sản phẩm"
-    document.getElementById('btnAllProducts').addEventListener('click', function() {
-        $('.category-checkbox').prop('checked', false);
-        loadProducts([]); // Gọi AJAX để hiển thị tất cả sản phẩm
+
+
+	//Xử lý khi checkbox thay đổi
+	$('.category-checkbox').change(function () {
+        const selectedCategoryIds = $('.category-checkbox:checked')
+            .map(function () {
+                return $(this).val();
+            })
+            .get();
+
+        if (selectedCategoryIds.length === 0) {
+            // Nếu không có danh mục nào được chọn, lấy tất cả sản phẩm
+            loadProducts();
+        } else {
+            // Gửi danh sách ID danh mục được chọn
+            loadProducts(selectedCategoryIds);
+        }
     });
 
-    // Hàm AJAX để load sản phẩm dựa trên danh mục
-    function loadProducts(categoryIds) {
+    // Hàm loadProducts
+    function loadProducts(categoryIds = null) {
         $.ajax({
-            type: "POST",
-            url: "${pageContext.request.contextPath}/filterProducts",
-            data: { categoryIds: categoryIds.join(",") },
-            success: function (data) {
-                $('#product-list').html(data); // Cập nhật danh sách sản phẩm
+            url: '${pageContext.request.contextPath}/home', // Thay đường dẫn servlet của bạn
+            type: 'GET',
+            data: categoryIds ? { id: categoryIds } : {}, // Nếu không có ID, gửi yêu cầu rỗng
+            success: function (response) {
+                $('#product-list').html(response); // Hiển thị kết quả trong vùng sản phẩm
             },
-            error: function (xhr, status, error) {
-                console.error("Error loading products: " + error);
+            error: function () {
+                alert('Có lỗi xảy ra!');
             }
         });
     }
-
-    // Xử lý sự kiện khi checkbox thay đổi
-    $('.category-checkbox').change(function() {
-        const selectedCategories = $('.category-checkbox:checked').map(function() {
-            return this.value;
-        }).get();
-
-        loadProducts(selectedCategories); // Gọi AJAX với danh sách đã chọn
-    });
+	
+	// Hàm AJAX để load sản phẩm
+	function loadProducts(categoryIds) {
+	    $.ajax({
+	        type: "GET",
+	        url: "${pageContext.request.contextPath}/home",
+	        traditional: true, // Quan trọng để gửi danh sách (Array)
+	        data: { id: categoryIds }, // Gửi danh sách ID
+	        success: function (data) {
+	            $('#product-list').html($(data).find('#product-list').html());
+	        },
+	        error: function (xhr, status, error) {
+	            console.error("Error loading products: " + error);
+	        }
+	    });
+	}
+	//Khi nhấn nút "Tất cả sản phẩm", bỏ chọn tất cả checkbox và hiển thị tất cả sản phẩm
+	$('#btnAllProducts').click(function () {
+	    $('.category-checkbox').prop('checked', false);
+	    loadProducts(null);
+	});
 </script>
 <%@ include file="/homeLayout/footer.jsp" %>

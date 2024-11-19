@@ -71,7 +71,7 @@ public class CategoryDAO {
         
         return null; // Trả về null nếu không tìm thấy
     }
-
+    
 
 
 //    public Integer getCategoryIDByName(String categoryName) {
