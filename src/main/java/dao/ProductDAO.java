@@ -145,7 +145,7 @@ public class ProductDAO {
                 product.setQuality(rs.getInt("Quality"));
                 product.setPrice(rs.getBigDecimal("Price"));
                 product.setDiscount(rs.getBigDecimal("Discount"));
-                product.setProductImagePath(rs.getString("ImagePath"));
+                product.setProductImagePath(rs.getString("productImagePath"));
                 product.setColor(rs.getString("Color"));
                 product.setStyle(rs.getString("Style"));
             }
