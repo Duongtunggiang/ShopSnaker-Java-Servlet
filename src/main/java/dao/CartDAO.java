@@ -88,4 +88,16 @@ public class CartDAO {
         }
         return false; // Lỗi
     }
+    public boolean deleteCartItem(int cartItemId) {
+        String sql = "DELETE FROM CartItem WHERE CartItemID = ?";
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, cartItemId);
+            return ps.executeUpdate() > 0; // Nếu xóa thành công, trả về true
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false; // Nếu có lỗi hoặc không tìm thấy CartItem, trả về false
+    }
+
 }

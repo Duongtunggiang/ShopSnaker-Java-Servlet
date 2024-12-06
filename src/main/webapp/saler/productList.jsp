@@ -36,26 +36,31 @@
                 <td>${product.price}</td>
                 <td>${product.quality}</td>
                 <td>
-                    <c:if test="${product.booking.status == 'Có thể bán'}">
+                    <c:if test="${product.status == 'Có thể bán'}">
                         <span class="text-success"><b>Có thể bán</b></span><a href="#" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updateStatusModal" 
    onclick="setProductId(${product.productID})">Cập nhật</a>
                     </c:if>
-                    <c:if test="${product.booking.status == 'Chưa thể bán'}">
+                    <c:if test="${product.status == 'Chưa thể bán'}">
                         <span class="text-danger"><b>Chưa thể bán </b></span><a href="#" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updateStatusModal" 
+   onclick="setProductId(${product.productID})">Cập nhật</a>
+                    </c:if>
+                    <c:if test="${product.status == 'Tạm dừng'}">
+                        <span class="text-warning"><b>Tạm dừng </b></span><a href="#" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updateStatusModal" 
    onclick="setProductId(${product.productID})">Cập nhật</a>
                     </c:if>
                     <p>${error}</p>
                 </td>
-                <td><img src="${pageContext.request.contextPath}/${product.productImagePath}" alt="Product Image"></td>
-                <td></td>
+                <td><img src="${pageContext.request.contextPath}/${product.productImagePath}" alt="Product Image" style="height: 150px; object-fit: cover;"></td>
+                <td>${product.categoryName}</td>
                 
-                <td>
-                    <a href="saler?action=editProduct&id=${product.productID}" class="btn btn-warning">Sửa</a>
-                    <form action="saler" method="post" style="display:inline;">
-                        <input type="hidden" name="action" value="deleteProduct">
-                        <input type="hidden" name="id" value="${product.productID}">
-                        <button type="submit" class="btn btn-danger">Xóa</button>
-                    </form>
+                <td><a href="${pageContext.request.contextPath}/saler-product-detail?productId=${product.productID}" class="btn btn-success m-2">Chi tiết</a>
+                    <%-- <a href="saler?action=editProduct&id=${product.productID}" class="btn btn-warning">Sửa</a> --%>
+                    <form action="saler?action=deleteProduct" method="post" style="display:inline;" onsubmit="return confirmDelete();">
+		                <input type="hidden" name="action" value="deleteProduct">
+		                <input type="hidden" name="id" value="${product.productID}">
+		                <button type="submit" class="btn btn-danger">Xóa</button>
+		            </form>
+		            
                 </td>
             </tr>
         </c:forEach>
@@ -65,11 +70,16 @@
     </c:if>
     </tbody>
 </table>
-<c:if test="${not empty successMessage}">
-    <div class="alert alert-success" role="alert">
-        ${successMessage}
-    </div>
-</c:if>
+	<c:if test="${not empty successMessage}">
+	    <div class="alert alert-success" role="alert">
+	        ${successMessage}
+	    </div>
+	</c:if>
+	<c:if test="${not empty error}">
+	    <div class="alert alert-danger">
+	        ${error}
+	    </div>
+	</c:if>
 
 <c:if test="${not empty errorMessage}">
     <div class="alert alert-danger" role="alert">
@@ -80,6 +90,11 @@
 
 
 </div>
+<script>
+    function confirmDelete() {
+        return confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?");
+    }
+</script>
 <!-- Modal -->
 <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusLabel" aria-hidden="true">
     <div class="modal-dialog">

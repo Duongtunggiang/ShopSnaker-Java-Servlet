@@ -211,7 +211,7 @@
                     <div class="card-body">
                         <h5 class="card-title">${product.productName}</h5>
                         <p class="card-text">Giá: ${product.price}</p>
-                        <p></p>
+                        <p style="font-size: 15px;">Danh mục:${product.categoryName}</p>
                         <a href="${pageContext.request.contextPath}/product-detail?productId=${product.productID}" class="btn btn-primary btn-sm">Chi tiết</a>
                         <form action="${pageContext.request.contextPath}/add-to-cart" method="POST">
 						    <input type="hidden" name="productId" value="${product.productID}">

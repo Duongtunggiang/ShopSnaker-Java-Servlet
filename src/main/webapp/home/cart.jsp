@@ -102,6 +102,7 @@
                             <th>Số lượng</th>
                             <th>Giá</th>
                             <th>Thành tiền</th>
+                            <th>Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -113,7 +114,13 @@
                                 <td>${item.price}</td>
                                 <%-- <td>${item.price.multiply(new java.math.BigDecimal(item.quantity))}</td> --%>
                             	<td>${item.totalPrice}</td>
-                            	
+                            	<td>
+                            	<a class="btn btn-success" href="#">Thanh toán</a>
+                            		<form action="delete-from-cart" method="post">
+							            <input type="hidden" name="cartItemId" value="${item.cartItemId}" />
+							            <button type="submit" class="btn btn-danger">Xóa</button>
+							        </form>
+                            	</td>
                             </tr>
                         </c:forEach>
                     </tbody>

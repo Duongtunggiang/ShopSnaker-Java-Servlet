@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -194,7 +195,6 @@ public class ProductController extends HttpServlet {
                     return;
                 }
 
-                // Tạo đối tượng Product và lưu vào cơ sở dữ liệu
                 Product newProduct = new Product();
                 newProduct.setSalerID(salerID);
                 newProduct.setCategoryID(cateID);
@@ -205,21 +205,20 @@ public class ProductController extends HttpServlet {
                 newProduct.setProductImagePath(imagePath);
                 newProduct.setColor(color);
                 newProduct.setStyle(style);
+                newProduct.setStatus("Chưa thể bán");
 
                 int productId = productDAO.addProduct(newProduct);
                 if (productId > 0) {
-                    BookingDAO bookingDAO = new BookingDAO();
-                    bookingDAO.createBooking(productId);
+                    response.sendRedirect("saler?action=myProducts");
+                } else {
+                    request.setAttribute("error6", "Không thể tạo sản phẩm.");
+                    request.getRequestDispatcher("saler/createProduct.jsp").forward(request, response);
                 }
-                
-                response.sendRedirect("saler?action=myProducts");
-
             } catch (Exception e) {
                 request.setAttribute("error6", "Đã xảy ra lỗi: " + e.getMessage());
                 request.getRequestDispatcher("saler/createProduct.jsp").forward(request, response);
             }
             break;
-
 
 
     
@@ -269,12 +268,17 @@ public class ProductController extends HttpServlet {
                 System.out.println("New Status: " + newStatus);
 
                 // Cập nhật trạng thái sản phẩm
-                BookingDAO bookingDAO = new BookingDAO();
-                bookingDAO.updateBookingStatus(productId, newStatus);  // Gọi phương thức cập nhật trạng thái
+                ProductDAO productDAO = new ProductDAO();
+                boolean isUpdated = productDAO.updateProductStatus(productId, newStatus);
 
-                // Sau khi cập nhật thành công, gửi thông báo và chuyển hướng
-                request.setAttribute("successMessage", "Trạng thái sản phẩm đã được cập nhật thành công!");
-                request.getRequestDispatcher("saler/productList.jsp").forward(request, response);  // Chuyển đến trang danh sách sản phẩm
+                if (isUpdated) {
+                    // Sau khi cập nhật thành công, gửi thông báo và chuyển hướng
+                    request.setAttribute("successMessage", "Trạng thái sản phẩm đã được cập nhật thành công!");
+                } else {
+                    // Thông báo lỗi nếu không cập nhật được
+                    request.setAttribute("errorMessage", "Không thể cập nhật trạng thái sản phẩm.");
+                }
+                response.sendRedirect("saler?action=myProducts");
 
             } catch (Exception e) {
                 // Xử lý lỗi nếu có
@@ -282,6 +286,33 @@ public class ProductController extends HttpServlet {
                 request.getRequestDispatcher("saler/productList.jsp").forward(request, response);
             }
             break;
+
+        case "deleteProduct":
+            try {
+                int productId = Integer.parseInt(request.getParameter("id"));
+                
+                boolean isDeleted = productDAO.deleteProduct(productId);
+                	System.out.println("ID delete: " + productId);
+                if (isDeleted) {
+                    response.sendRedirect("saler?action=myProducts");
+                    System.out.println("Delete Success!");
+                } else {
+                    request.setAttribute("error", "Không thể xóa sản phẩm. Có thể sản phẩm không tồn tại hoặc có lỗi hệ thống.");
+                    request.getRequestDispatcher("saler/productList.jsp").forward(request, response);
+                   
+                }
+            } catch (NumberFormatException e) {
+                request.setAttribute("error", "Lỗi: ID sản phẩm không hợp lệ.");
+                request.getRequestDispatcher("saler/productList.jsp").forward(request, response);
+            
+            } catch (Exception e) {
+                request.setAttribute("error", "Đã xảy ra lỗi không xác định: " + e.getMessage());
+                request.getRequestDispatcher("saler/productList.jsp").forward(request, response);
+            }
+            
+            break;
+            
+
 
             
         default:
