@@ -12,46 +12,113 @@
 <body>
 <div class="container">
     <h1>Danh sách sản phẩm</h1>
-    <a href="saler?action=salerHome" class="text-link p-3">&lt;Trở lại</a>
-    <a href="saler?action=createProduct" class="btn btn-primary">Thêm sản phẩm mới</a>
-    <table class="table">
-        <thead>
+<a href="saler?action=salerHome" class="text-link p-3">&lt;Trở lại</a>
+<a href="saler?action=createProduct" class="btn btn-primary">Thêm sản phẩm mới</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tên sản phẩm</th>
+            <th>Giá</th>
+            <th>Số lượng</th>
+            <th>Trạng thái</th>
+            <th>Ảnh</th>
+            <th>Danh mục</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+    <c:if test="${not empty products}">
+        <c:forEach var="product" items="${products}">
             <tr>
-                <th>ID</th>
-                <th>Tên sản phẩm</th>
-                <th>Giá</th>
-                <th>Số lượng</th>
-                <th>Ảnh</th>
-                <th>Hành động</th>
+                <td>${product.productID}</td>
+                <td>${product.productName}</td>
+                <td>${product.price}</td>
+                <td>${product.quality}</td>
+                <td>
+                    <c:if test="${product.booking.status == 'Có thể bán'}">
+                        <span class="text-success"><b>Có thể bán</b></span><a href="#" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updateStatusModal" 
+   onclick="setProductId(${product.productID})">Cập nhật</a>
+                    </c:if>
+                    <c:if test="${product.booking.status == 'Chưa thể bán'}">
+                        <span class="text-danger"><b>Chưa thể bán </b></span><a href="#" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updateStatusModal" 
+   onclick="setProductId(${product.productID})">Cập nhật</a>
+                    </c:if>
+                    <p>${error}</p>
+                </td>
+                <td><img src="${pageContext.request.contextPath}/${product.productImagePath}" alt="Product Image"></td>
+                <td></td>
+                
+                <td>
+                    <a href="saler?action=editProduct&id=${product.productID}" class="btn btn-warning">Sửa</a>
+                    <form action="saler" method="post" style="display:inline;">
+                        <input type="hidden" name="action" value="deleteProduct">
+                        <input type="hidden" name="id" value="${product.productID}">
+                        <button type="submit" class="btn btn-danger">Xóa</button>
+                    </form>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-        <c:if test="${not empty products}">
-            <c:forEach var="product" items="${products}">
-                <tr>
-                    <td>${product.productID}</td>
-                    <td>${product.productName}</td>
-                    <td>${product.price}</td>
-                    <td>${product.quality}</td>
-                    <td><img src="${pageContext.request.contextPath}/${product.productImagePath}" alt="Product Image">
-                    </td>
-                    <td>
-                        <a href="saler?action=editProduct&id=${product.productID}" class="btn btn-warning">Sửa</a>
-                        <form action="saler" method="post" style="display:inline;">
-                            <input type="hidden" name="action" value="deleteProduct">
-                            <input type="hidden" name="id" value="${product.productID}">
-                            <button type="submit" class="btn btn-danger">Xóa</button>
-                        </form>
-                    </td>
-                </tr>
-            </c:forEach>
-            </c:if>
-			<c:if test="${empty products}">
-			    <p>Không có sản phẩm nào để hiển thị.</p>
-			</c:if>
-        </tbody>
-    </table>
+        </c:forEach>
+    </c:if>
+    <c:if test="${empty products}">
+        <p>Không có sản phẩm nào để hiển thị.</p>
+    </c:if>
+    </tbody>
+</table>
+<c:if test="${not empty successMessage}">
+    <div class="alert alert-success" role="alert">
+        ${successMessage}
+    </div>
+</c:if>
+
+<c:if test="${not empty errorMessage}">
+    <div class="alert alert-danger" role="alert">
+        ${errorMessage}
+    </div>
+</c:if>
+
+
+
 </div>
-<script src="path/to/bootstrap.bundle.min.js"></script> <!-- Đường dẫn tới Bootstrap JS -->
+<!-- Modal -->
+<div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateStatusLabel">Cập nhật trạng thái</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="saler?action=updateStatus" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="productId" name="productId">
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Trạng thái</label>
+                        <select id="status" name="status" class="form-select">
+                            <option value="Có thể bán">Có thể bán</option>
+                            <option value="Chưa thể bán">Chưa thể bán</option>
+                            <option value="Tạm dừng">Tạm dừng</option>
+                        </select>
+                    </div>
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-warning">Cập nhật trạng thái</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Hàm để gán ID sản phẩm vào input ẩn trong modal
+    function setProductId(id) {
+        document.getElementById("productId").value = id;
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"></script>
+
 </body>
 </html>

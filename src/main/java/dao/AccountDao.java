@@ -28,27 +28,54 @@ public class AccountDao {
             e.printStackTrace();
         }
     }
- // Phương thức để lấy salerID dựa trên username
-//    public static Integer getSalerIDByUsername(String username) {
-//        Integer salerID = null;
-//        String sql = "SELECT AccountID FROM Account WHERE username = ?";
-//
-//        try (Connection connection = DBContext.getConnection();
-//             PreparedStatement statement = connection.prepareStatement(sql)) {
-//            statement.setString(1, username);
-//
-//            try (ResultSet resultSet = statement.executeQuery()) {
-//                if (resultSet.next()) {
-//                    salerID = resultSet.getInt("salerID");
-//                }
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return salerID;
-//    }
-    
+    public static void update(Customer customer) {
+        String sql = "UPDATE Customer SET firstName = ?, lastName = ?, phoneNumber = ?, address = ?, from = ? WHERE customerID = ?";
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, customer.getFirstName());
+            ps.setString(2, customer.getLastName());
+            ps.setString(3, customer.getPhoneNumber());
+            ps.setString(4, customer.getAddress());
+            ps.setString(5, customer.getFrom());
+            ps.setInt(6, customer.getCustomerID());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int getCustomerId(int accountID) {
+        String sql = "SELECT CustomerID FROM Customer WHERE AccountID = ?";
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, accountID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("CustomerID");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi khi lấy CustomerID: " + e.getMessage());
+        }
+        return -1; // Trả về -1 nếu không tìm thấy
+    }
+
+    public int getSalerId(int accountID) {
+        String sql = "SELECT SalerID FROM Saler WHERE AccountID = ?";
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, accountID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("SalerID");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi khi lấy SalerID: " + e.getMessage());
+        }
+        return -1; // Trả về -1 nếu không tìm thấy
+    }
+
 	/*
 	 * Trước tiên, hãy cập nhật AccountDao để lấy SalerID từ username qua bảng
 	 * Account. Phương thức này sẽ truy vấn AccountID từ bảng Account, sau đó sử
@@ -78,6 +105,29 @@ public class AccountDao {
         return salerID;
     
     }
+    public Integer getCustomerIdByUsername(String username) {
+        Integer customerId = null;
+        String sql = "SELECT c.CustomerID " +
+                     "FROM Account a " +
+                     "JOIN Customer c ON a.AccountID = c.AccountID " +
+                     "WHERE a.Username = ?";
+
+        try (Connection connection = DBContext.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, username);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    customerId = resultSet.getInt("CustomerID");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi khi lấy CustomerID từ username: " + e.getMessage());
+        }
+
+        return customerId; // Trả về ID hoặc null nếu không tìm thấy
+    }
+
 
     
     private static final String LayID = "SELECT AccountID FROM Account WHERE username = ?";

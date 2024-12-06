@@ -10,8 +10,10 @@ public class Transactions {
 	private LocalDateTime transactionsDate;
 	private String status;
 	private String paymentMethod;
+	private int customerWalletId;
+	private int salerWalletId;
 	public Transactions(int transactionsId, int bookingId, BigDecimal amount, LocalDateTime transactionsDate,
-			String status, String paymentMethod) {
+			String status, String paymentMethod, int customerWalletId, int salerWalletId) {
 		super();
 		this.transactionsId = transactionsId;
 		this.bookingId = bookingId;
@@ -19,6 +21,11 @@ public class Transactions {
 		this.transactionsDate = transactionsDate;
 		this.status = status;
 		this.paymentMethod = paymentMethod;
+		this.customerWalletId = customerWalletId;
+		this.salerWalletId = salerWalletId;
+	}
+	public Transactions() {
+		super();
 	}
 	public int getTransactionsId() {
 		return transactionsId;
@@ -56,8 +63,20 @@ public class Transactions {
 	public void setPaymentMethod(String paymentMethod) {
 		this.paymentMethod = paymentMethod;
 	}
-	public Transactions() {
+	public int getCustomerWalletId() {
+		return customerWalletId;
 	}
+	public void setCustomerWalletId(int customerWalletId) {
+		this.customerWalletId = customerWalletId;
+	}
+	public int getSalerWalletId() {
+		return salerWalletId;
+	}
+	public void setSalerWalletId(int salerWalletId) {
+		this.salerWalletId = salerWalletId;
+	}
+	
+	
 	
 	
 }

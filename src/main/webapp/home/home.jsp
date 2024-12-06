@@ -92,7 +92,7 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="${pageContext.request.contextPath}">Logo</a>
+        <a class="navbar-brand" href="${pageContext.request.contextPath}/home">Logo</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -109,6 +109,11 @@
                 </li>
             </ul>
             <ul class="navbar-nav">
+	            <li class="nav-item">
+                    <a class="nav-link" href="${pageContext.request.contextPath}/cart">
+                        <i class="fa fa-shopping-cart"></i> Giỏ hàng
+                    </a>
+                </li>
                 <c:choose>
                     <c:when test="${empty sessionScope.username}">
                         <a class="nav-link" href="${pageContext.request.contextPath}/login.jsp">Tài khoản
@@ -123,7 +128,7 @@
                                 <i class="fa fa-user"></i>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-							    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/infor-customer?user=${sessionScope.username}">Cá nhân</a></li>
+							    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/profile">Cá nhân</a></li>
 							    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/my-wallet">Ví của tôi</a></li>
 							    <li><hr class="dropdown-divider"></li>
 							    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/logout">Đăng xuất</a></li>
@@ -208,7 +213,14 @@
                         <p class="card-text">Giá: ${product.price}</p>
                         <p></p>
                         <a href="${pageContext.request.contextPath}/product-detail?productId=${product.productID}" class="btn btn-primary btn-sm">Chi tiết</a>
-                        <a href="${pageContext.request.contextPath}/addToCart?productId=${product.productID}" class="btn btn-success btn-sm">Thêm vào giỏ</a>
+                        <form action="${pageContext.request.contextPath}/add-to-cart" method="POST">
+						    <input type="hidden" name="productId" value="${product.productID}">
+						    <input type="hidden" name="productName" value="${product.productName}">
+						    <input type="hidden" name="quantity" value="1"> <!-- Giả sử bạn thêm 1 sản phẩm -->
+						    <input type="hidden" name="price" value="${product.price}">
+						    <button type="submit" class="btn btn-success btn-sm">Thêm vào giỏ</button>
+						</form>
+
                         <a href="${pageContext.request.contextPath}/buyNow?productId=${product.productID}" class="btn btn-danger btn-sm">Mua ngay</a>
                     </div>
                 </div>

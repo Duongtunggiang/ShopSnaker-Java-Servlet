@@ -6,19 +6,24 @@ import java.time.LocalDateTime;
 public class Booking {
 	private int bookingId;
 	private int customerId;
+	private int productId;
 	private String bookingCode;
 	private String Status;
 	private BigDecimal totalAmount;
 	private LocalDateTime createDate;
-	public Booking(int bookingId, int customerId, String bookingCode, String status, BigDecimal totalAmount,
-			LocalDateTime createDate) {
+	public Booking(int bookingId, int customerId, int productId, String bookingCode, String status,
+			BigDecimal totalAmount, LocalDateTime createDate) {
 		super();
 		this.bookingId = bookingId;
 		this.customerId = customerId;
+		this.productId = productId;
 		this.bookingCode = bookingCode;
 		Status = status;
 		this.totalAmount = totalAmount;
 		this.createDate = createDate;
+	}
+	public Booking() {
+		super();
 	}
 	public int getBookingId() {
 		return bookingId;
@@ -31,6 +36,12 @@ public class Booking {
 	}
 	public void setCustomerId(int customerId) {
 		this.customerId = customerId;
+	}
+	public int getProductId() {
+		return productId;
+	}
+	public void setProductId(int productId) {
+		this.productId = productId;
 	}
 	public String getBookingCode() {
 		return bookingCode;

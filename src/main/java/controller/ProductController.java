@@ -10,14 +10,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import dao.AccountDao;
+import dao.BookingDAO;
 import dao.CategoryDAO;
 import models.Product;
+import models.Booking;
 import models.Category;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @WebServlet("/saler")
@@ -61,6 +64,22 @@ public class ProductController extends HttpServlet {
                 request.setAttribute("product", product);
                 request.getRequestDispatcher("saler/editProduct.jsp").forward(request, response); 
                 break;
+            case "updateStatus":
+                // Lấy thông tin từ form
+                int productIdS = Integer.parseInt(request.getParameter("productId"));
+                String status = request.getParameter("status");
+
+                // Tạo BookingDAO để gọi phương thức cập nhật trạng thái
+                BookingDAO bookingDAO = new BookingDAO();
+                
+                // Cập nhật trạng thái trong bảng booking
+                bookingDAO.updateBookingStatus(productIdS, status);
+
+                // Sau khi cập nhật xong, bạn có thể gửi lại thông báo hoặc chuyển hướng về trang sản phẩm
+                response.sendRedirect("saler?action=myProducts"); // Hoặc bạn có thể quay lại trang chi tiết sản phẩm
+                break;
+
+ 
 
             default:
                 response.sendRedirect("saler?action=salerHome");
@@ -187,7 +206,12 @@ public class ProductController extends HttpServlet {
                 newProduct.setColor(color);
                 newProduct.setStyle(style);
 
-                productDAO.addProduct(newProduct);
+                int productId = productDAO.addProduct(newProduct);
+                if (productId > 0) {
+                    BookingDAO bookingDAO = new BookingDAO();
+                    bookingDAO.createBooking(productId);
+                }
+                
                 response.sendRedirect("saler?action=myProducts");
 
             } catch (Exception e) {
@@ -235,201 +259,35 @@ public class ProductController extends HttpServlet {
             }
             break;
 
-            default:
-                response.sendRedirect("saler?action=myProducts");
-                break;
+            
+        case "updateStatus":
+            try {
+                // Lấy thông tin từ request
+                int productId = Integer.parseInt(request.getParameter("productId"));
+                String newStatus = request.getParameter("status");
+                System.out.println("Product ID: " + productId);
+                System.out.println("New Status: " + newStatus);
+
+                // Cập nhật trạng thái sản phẩm
+                BookingDAO bookingDAO = new BookingDAO();
+                bookingDAO.updateBookingStatus(productId, newStatus);  // Gọi phương thức cập nhật trạng thái
+
+                // Sau khi cập nhật thành công, gửi thông báo và chuyển hướng
+                request.setAttribute("successMessage", "Trạng thái sản phẩm đã được cập nhật thành công!");
+                request.getRequestDispatcher("saler/productList.jsp").forward(request, response);  // Chuyển đến trang danh sách sản phẩm
+
+            } catch (Exception e) {
+                // Xử lý lỗi nếu có
+                request.setAttribute("errorMessage", "Đã xảy ra lỗi: " + e.getMessage());
+                request.getRequestDispatcher("saler/productList.jsp").forward(request, response);
+            }
+            break;
+
+            
+        default:
+            response.sendRedirect("saler?action=myProducts");
+            break;
+
         }
     }
 }
-// Phần case "saveProduct":
-//case "saveProduct":
-//  try {
-//      // Lấy salerID từ session
-//      HttpSession session = request.getSession();
-//      Object usernameAttribute = session.getAttribute("username");
-//
-//      Integer salerID = null;
-//      if (usernameAttribute instanceof Integer) {
-//          salerID = (Integer) usernameAttribute;
-//      } else if (usernameAttribute instanceof String) {
-//          salerID = Integer.parseInt((String) usernameAttribute);
-//      }
-//
-//      if (salerID == null) {
-//          request.setAttribute("error", "Saler ID không hợp lệ.");
-//          request.getRequestDispatcher("saler/createProduct.jsp").forward(request, response);
-//          return;
-//      }
-//
-//      // Lấy CategoryID từ tên danh mục
-//      String categoryIDStr = request.getParameter("categories");
-//      int categoryID = categoryDAO.getCategoryIDByName(categoryIDStr);
-//      if (categoryID == 0) { 
-//          request.setAttribute("error1", "Danh mục không hợp lệ.");
-//          request.getRequestDispatcher("saler/createProduct.jsp").forward(request, response);
-//          return;
-//      }
-//
-//      String productName = request.getParameter("productName");
-//      String priceStr = request.getParameter("price");
-//      String discountStr = request.getParameter("discount");
-//      String imagePath = request.getParameter("productImagePath");
-//      String color = request.getParameter("color");
-//      String style = request.getParameter("style");
-//
-//      int quality = 1; 
-//
-//      if (priceStr == null || priceStr.isEmpty()) {
-//          request.setAttribute("error3", "Giá không hợp lệ.");
-//          request.getRequestDispatcher("saler/createProduct.jsp").forward(request, response);
-//          return;
-//      }
-//      BigDecimal price = new BigDecimal(priceStr);
-//
-//      BigDecimal discount = null;
-//      if (discountStr != null && !discountStr.isEmpty()) {
-//          discount = new BigDecimal(discountStr);
-//      }
-//
-//      Product newProduct = new Product();
-//      newProduct.setSalerID(salerID);
-//      newProduct.setCategoryID(categoryID);
-//      newProduct.setProductName(productName);
-//      newProduct.setQuality(quality); 
-//      newProduct.setPrice(price);
-//      newProduct.setDiscount(discount);
-//      newProduct.setProductImagePath(imagePath);
-//      newProduct.setColor(color);
-//      newProduct.setStyle(style);
-//      
-////      productDAO.addProduct(newProduct);
-////      response.sendRedirect("saler?action=myProducts");
-//
-//      try {
-//          productDAO.addProduct(newProduct);
-//          response.sendRedirect("saler?action=myProducts");
-//      } catch (Exception e) {
-//          e.printStackTrace();
-//          request.setAttribute("error4", "Không thể thêm sản phẩm do lỗi cơ sở dữ liệu.");
-//          request.getRequestDispatcher("saler/createProduct.jsp").forward(request, response);
-//      }
-//
-//  } catch (NumberFormatException e) {
-//      request.setAttribute("error5", "Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.");
-//      request.getRequestDispatcher("saler/createProduct.jsp").forward(request, response);
-//  } catch (Exception e) {
-//      request.setAttribute("error6", "Đã xảy ra lỗi: " + e.getMessage());
-//      request.getRequestDispatcher("saler/createProduct.jsp").forward(request, response);
-//  }
-//  break;
-
-//    // Lấy salerID từ session
-//    HttpSession session = request.getSession();
-//    Object username = session.getAttribute("username");
-
-//    Integer salerID = null;
-//    if (username instanceof Integer) {
-//        salerID = (Integer) username;
-//    } else if (username instanceof String) {
-//        salerID = Integer.parseInt((String) username);
-//    }
-//
-//    if (salerID == null) {
-//        request.setAttribute("error", "Saler ID không hợp lệ.");
-//        request.getRequestDispatcher("saler/createProduct.jsp").forward(request, response);
-//        return;
-//    }
-  	
-//      HttpSession session = request.getSession();
-//      String username = (String) session.getAttribute("username");
-//      
-//      Integer salerID = null;
-//      if (username != null) {
-//          salerID = AccountDao.getSalerIDByUsername(username);
-//      }
-//      
-//      if (salerID == null) {
-//          request.setAttribute("error", "Saler ID không hợp lệ.");
-//          request.getRequestDispatcher("saler/createProduct.jsp").forward(request, response);
-//          return;
-//      }
-//case "saveProduct":
-//  try {	
-//  	HttpSession session = request.getSession();
-//      String username =  (String) session.getAttribute("username");
-//
-//      AccountDao accountDao = new AccountDao(); // Khởi tạo với kết nối đến DB
-//      Integer salerID = accountDao.getSalerIDByUsername(username);
-//
-//      if (salerID == null) {
-//          request.setAttribute("error", "Không tìm thấy Saler ID.");
-//          request.getRequestDispatcher("saler/createProduct.jsp").forward(request, response);
-//          return;
-//      }
-//
-//      String categoryName = request.getParameter("categories");
-//      int categoryID = categoryDAO.getCategoryIDByName(categoryName);
-//      if (categoryID <= 0) {
-//          request.setAttribute("error1", "Danh mục không hợp lệ.");
-//          request.getRequestDispatcher("saler/createProduct.jsp").forward(request, response);
-//          return;
-//      }
-//
-//      String productName = request.getParameter("productName");
-//
-//      String priceStr = request.getParameter("price");
-//      BigDecimal price;
-//      try {
-//          price = new BigDecimal(priceStr);
-//      } catch (NumberFormatException e) {
-//          request.setAttribute("error3", "Giá không hợp lệ.");
-//          request.getRequestDispatcher("saler/createProduct.jsp").forward(request, response);
-//          return;
-//      }
-//
-//      String discountStr = request.getParameter("discount");
-//      BigDecimal discount = BigDecimal.ZERO;
-//      try {
-//          if (discountStr != null && !discountStr.isEmpty()) {
-//              discount = new BigDecimal(discountStr);
-//          }
-//      } catch (NumberFormatException e) {
-//          request.setAttribute("error3", "Giảm giá không hợp lệ.");
-//          request.getRequestDispatcher("saler/createProduct.jsp").forward(request, response);
-//          return;
-//      }
-//
-//      String imagePath = request.getParameter("productImagePath");
-//      String color = request.getParameter("color");
-//      String style = request.getParameter("style");
-//
-//      int quality = 1;
-//      String qualityStr = request.getParameter("quality");
-//      try {
-//          if (qualityStr != null && !qualityStr.isEmpty()) {
-//              quality = Integer.parseInt(qualityStr);
-//          }
-//      } catch (NumberFormatException e) {
-//          request.setAttribute("error3", "Số lượng không hợp lệ.");
-//          request.getRequestDispatcher("saler/createProduct.jsp").forward(request, response);
-//          return;
-//      }
-//
-//      Product newProduct = new Product();
-//      newProduct.setSalerID(salerID);
-//      newProduct.setCategoryID(categoryID);
-//      newProduct.setProductName(productName);
-//      newProduct.setQuality(quality);
-//      newProduct.setPrice(price);
-//      newProduct.setDiscount(discount);
-//      newProduct.setProductImagePath(imagePath);
-//      newProduct.setColor(color);
-//      newProduct.setStyle(style);
-//      
-//      productDAO.addProduct(newProduct);
-//      response.sendRedirect("saler?action=myProducts");
-//  } catch (Exception e) {
-//      request.setAttribute("error6", "Đã xảy ra lỗi: " + e.getMessage());
-//      request.getRequestDispatcher("saler/createProduct.jsp").forward(request, response);
-//  }
-//  break;

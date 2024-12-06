@@ -8,6 +8,9 @@ public class Cart {
 		this.cartId = cartId;
 		this.customerId = customerId;
 	}
+	public Cart() {
+		// TODO Auto-generated constructor stub
+	}
 	public int getCartId() {
 		return cartId;
 	}

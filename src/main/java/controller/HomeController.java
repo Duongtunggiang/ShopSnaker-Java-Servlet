@@ -51,18 +51,20 @@ public class HomeController extends HttpServlet {
         List<Product> products;
 
         if (categoryIdsParam == null || categoryIdsParam.length == 0) {
-            products = productDAO.getAllProducts(); 
+            products = productDAO.getAvailableProducts(); // Lấy sản phẩm có thể bán
         } else {
             List<Integer> categoryIds = Arrays.stream(categoryIdsParam)
                                               .map(Integer::parseInt)
                                               .collect(Collectors.toList());
-            products = productDAO.getProductsByCategories(categoryIds);
+            products = productDAO.getProductsByCategories(categoryIds); // Lọc theo danh mục và trạng thái
         }
 
         request.setAttribute("categories", categories);
         request.setAttribute("products", products);
         request.getRequestDispatcher("/home/home.jsp").forward(request, response);
     }
+
+
 
 
 

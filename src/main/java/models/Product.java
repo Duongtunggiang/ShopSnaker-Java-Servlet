@@ -13,6 +13,17 @@ public class Product {
     private String productImagePath;
     private String color;
     private String style;
+    // Thêm đối tượng Booking để lưu trữ status từ bảng Booking
+    private Booking booking;
+
+    // Getter và Setter cho Booking
+    public Booking getBooking() {
+        return booking;
+    }
+
+    public void setBooking(Booking booking) {
+        this.booking = booking;
+    }
 
     // Constructor
     public Product() {
